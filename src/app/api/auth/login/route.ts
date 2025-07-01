@@ -6,8 +6,6 @@ import { handleApiError } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
   try {
-    // console.log("request", await request.text());
-
     const body = await request.json();
 
     const { email, password } = body;
