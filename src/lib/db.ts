@@ -7,7 +7,6 @@ const DB_PATH =
   process.env.DATABASE_PATH ??
   path.join(process.cwd(), "data", "expense_tracker.db");
 
-// Ensure the data directory exists
 const dataDir = path.dirname(DB_PATH);
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
@@ -40,7 +39,6 @@ const initializeDatabase = () => {
     )
   `);
 
-  // Create expenses table
   db.exec(`
     CREATE TABLE IF NOT EXISTS expenses (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,25 +70,40 @@ const initializeDatabase = () => {
     .prepare("SELECT COUNT(*) as count FROM users WHERE email = ?")
     .get("admin@example.com") as { count: number };
 
+  const employeeExists = db
+    .prepare("SELECT COUNT(*) as count FROM users WHERE email = ?")
+    .get("john@example.com") as { count: number };
+
   if (adminExists.count === 0) {
-    const hashedPassword = bcrypt.hashSync("admin123", 10);
+    try {
+      const hashedPassword = bcrypt.hashSync("admin123", 10);
+      db.prepare(
+        `INSERT INTO users (name, email, password, role)
+         VALUES (?, ?, ?, ?)`
+      ).run("Admin User", "admin@example.com", hashedPassword, "admin");
+      console.log("Default admin user created");
+    } catch (error: unknown) {
+      console.error(
+        "Error creating admin user:",
+        error instanceof Error ? error.message : String(error)
+      );
+    }
+  }
 
-    db.prepare(
-      `
-      INSERT INTO users (name, email, password, role)
-      VALUES (?, ?, ?, ?)
-    `
-    ).run("Admin User", "admin@example.com", hashedPassword, "admin");
-
-    const empPassword = bcrypt.hashSync("employee123", 10);
-    db.prepare(
-      `
-      INSERT INTO users (name, email, password, role)
-      VALUES (?, ?, ?, ?)
-    `
-    ).run("John Doe", "john@example.com", empPassword, "employee");
-
-    console.log("Default users created");
+  if (employeeExists.count === 0) {
+    try {
+      const empPassword = bcrypt.hashSync("employee123", 10);
+      db.prepare(
+        `INSERT INTO users (name, email, password, role)
+         VALUES (?, ?, ?, ?)`
+      ).run("John Doe", "john@example.com", empPassword, "employee");
+      console.log("Default employee user created");
+    } catch (error: unknown) {
+      console.error(
+        "Error creating employee user:",
+        error instanceof Error ? error.message : String(error)
+      );
+    }
   }
 };
 
