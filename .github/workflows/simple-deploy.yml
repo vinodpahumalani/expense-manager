@@ -77,9 +77,6 @@ jobs:
             echo "Building application..."
             npm run build
 
-            # Create data directory
-            mkdir -p data
-
             # Stop existing application
             pm2 stop expense-management || echo "No existing app to stop"
             pm2 delete expense-management || echo "No existing app to delete"

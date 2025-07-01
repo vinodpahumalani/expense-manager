@@ -15,6 +15,7 @@ if (!fs.existsSync(dataDir)) {
 declare global {
   var sqlite: Database.Database | undefined;
   var dbInitialized: boolean | undefined;
+  var dbSeeded: boolean | undefined;
 }
 
 const db: Database.Database = (() => {
@@ -27,6 +28,8 @@ const db: Database.Database = (() => {
 })();
 
 const initializeDatabase = () => {
+  global.dbInitialized = true;
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,42 +68,33 @@ const initializeDatabase = () => {
     CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses (category);
     CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses (date);
   `);
+};
 
-  const adminExists = db
-    .prepare("SELECT COUNT(*) as count FROM users WHERE email = ?")
-    .get("admin@example.com") as { count: number };
+const seedDatabase = () => {
+  global.dbSeeded = true;
 
-  const employeeExists = db
-    .prepare("SELECT COUNT(*) as count FROM users WHERE email = ?")
-    .get("john@example.com") as { count: number };
+  const userCount = db.prepare("SELECT COUNT(*) as count FROM users").get() as {
+    count: number;
+  };
 
-  if (adminExists.count === 0) {
+  if (userCount.count === 0) {
     try {
       const hashedPassword = bcrypt.hashSync("admin123", 10);
       db.prepare(
         `INSERT INTO users (name, email, password, role)
          VALUES (?, ?, ?, ?)`
       ).run("Admin User", "admin@example.com", hashedPassword, "admin");
-      console.log("Default admin user created");
-    } catch (error: unknown) {
-      console.error(
-        "Error creating admin user:",
-        error instanceof Error ? error.message : String(error)
-      );
-    }
-  }
 
-  if (employeeExists.count === 0) {
-    try {
       const empPassword = bcrypt.hashSync("employee123", 10);
       db.prepare(
         `INSERT INTO users (name, email, password, role)
          VALUES (?, ?, ?, ?)`
       ).run("John Doe", "john@example.com", empPassword, "employee");
-      console.log("Default employee user created");
+
+      console.log("Default users created");
     } catch (error: unknown) {
       console.error(
-        "Error creating employee user:",
+        "Error creating default users:",
         error instanceof Error ? error.message : String(error)
       );
     }
@@ -109,7 +103,10 @@ const initializeDatabase = () => {
 
 if (!global.dbInitialized) {
   initializeDatabase();
-  global.dbInitialized = true;
+}
+
+if (!global.dbSeeded) {
+  seedDatabase();
 }
 
 export default db;
