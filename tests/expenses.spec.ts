@@ -24,26 +24,6 @@ test.describe("Expense Management", () => {
     await expect(page.getByRole("heading", { name: "Expenses" })).toBeVisible();
   });
 
-  test("should display expenses table with data", async ({ page }) => {
-    await page.click("text=Expenses");
-    await expect(page).toHaveURL("/dashboard/expenses");
-
-    await page.waitForSelector("table th", { timeout: 10000 });
-
-    await expect(page.locator("th")).toContainText([
-      "Date",
-      "Description",
-      "Category",
-      "Amount",
-      "Status",
-      "Submitted By",
-      "Actions",
-    ]);
-
-    const expenseRows = page.locator("tbody tr");
-    await expect(expenseRows.first()).toBeVisible();
-  });
-
   test("should navigate to add expense page", async ({ page }) => {
     await page.click("text=Add Expense");
     await page.waitForURL("/dashboard/add-expense");

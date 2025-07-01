@@ -92,11 +92,8 @@ npx playwright show-report
 
 #### Test Coverage
 
-- **54 total tests** across 5 test suites
+- **53 total tests** across 5 test suites
 - Authentication, expense management, approvals, analytics, and RBAC
-- Cross-browser testing (Chrome, Firefox, Safari)
-- Mobile viewport testing
-- Accessibility compliance testing
 
 For detailed testing documentation, see [`TESTING.md`](./TESTING.md).
 
