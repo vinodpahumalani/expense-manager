@@ -1,25 +1,30 @@
 import Database from "better-sqlite3";
 import bcrypt from "bcryptjs";
 import path from "path";
+import fs from "fs";
 
 const DB_PATH =
-  process.env.DATABASE_PATH ||
+  process.env.DATABASE_PATH ??
   path.join(process.cwd(), "data", "expense_tracker.db");
+
+// Ensure the data directory exists
+const dataDir = path.dirname(DB_PATH);
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
 
 declare global {
   var sqlite: Database.Database | undefined;
 }
 
-let db: Database.Database;
-
-if (process.env.NODE_ENV === "production") {
-  db = new Database(DB_PATH);
-} else {
-  if (!global.sqlite) {
-    global.sqlite = new Database(DB_PATH);
+const db: Database.Database = (() => {
+  if (process.env.NODE_ENV === "production") {
+    return new Database(DB_PATH);
+  } else {
+    global.sqlite ??= new Database(DB_PATH);
+    return global.sqlite;
   }
-  db = global.sqlite;
-}
+})();
 
 const initializeDatabase = () => {
   db.exec(`
