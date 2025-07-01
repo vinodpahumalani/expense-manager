@@ -70,6 +70,9 @@ jobs:
               git clone https://github.com/${{ github.repository }}.git .
             fi
 
+            # Load NVM or add Node.js path manually
+            export PATH=$PATH:/home/ubuntu/.nvm/versions/node/v22.17.0/bin
+
             # Install dependencies and build
             echo "Installing dependencies..."
             npm ci
