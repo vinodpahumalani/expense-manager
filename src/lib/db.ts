@@ -15,6 +15,7 @@ if (!fs.existsSync(dataDir)) {
 
 declare global {
   var sqlite: Database.Database | undefined;
+  var dbInitialized: boolean | undefined;
 }
 
 const db: Database.Database = (() => {
@@ -93,6 +94,9 @@ const initializeDatabase = () => {
   }
 };
 
-initializeDatabase();
+if (!global.dbInitialized) {
+  initializeDatabase();
+  global.dbInitialized = true;
+}
 
 export default db;
