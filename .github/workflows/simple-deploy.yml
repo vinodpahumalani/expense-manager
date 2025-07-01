@@ -32,6 +32,9 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
+          JWT_SECRET: test-jwt-secret-for-ci-environment
+          DATABASE_PATH: ./data/test_expense_tracker.db
+          NODE_ENV: test
 
   deploy:
     needs: test
