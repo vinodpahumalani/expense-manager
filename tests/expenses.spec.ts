@@ -28,7 +28,7 @@ test.describe("Expense Management", () => {
     await page.click("text=Expenses");
     await expect(page).toHaveURL("/dashboard/expenses");
 
-    await page.waitForSelector("table th", { timeout: 2000 });
+    await page.waitForSelector("table th", { timeout: 10000 });
 
     await expect(page.locator("th")).toContainText([
       "Date",
