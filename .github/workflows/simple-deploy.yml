@@ -54,11 +54,11 @@ jobs:
           port: ${{ secrets.EC2_PORT || 22 }}
           script: |
             # Navigate to application directory
-            cd /var/www/expense-management || {
+            cd /var/www/expense-manager || {
               echo "Creating application directory..."
-              sudo mkdir -p /var/www/expense-management
-              sudo chown $USER:$USER /var/www/expense-management
-              cd /var/www/expense-management
+              sudo mkdir -p /var/www/expense-manager
+              sudo chown $USER:$USER /var/www/expense-manager
+              cd /var/www/expense-manager
             }
 
             # Clone or pull latest code
@@ -78,12 +78,12 @@ jobs:
             npm run build
 
             # Stop existing application
-            pm2 stop expense-management || echo "No existing app to stop"
-            pm2 delete expense-management || echo "No existing app to delete"
+            pm2 stop expense-manager || echo "No existing app to stop"
+            pm2 delete expense-manager || echo "No existing app to delete"
 
             # Start application
             echo "Starting application..."
-            pm2 start npm --name "expense-management" -- start
+            pm2 start npm --name "expense-manager" -- start
             pm2 save
 
             echo "Deployment completed successfully!"
